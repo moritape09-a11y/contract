@@ -221,10 +221,41 @@
     font-style: italic;
 }
 
-/* Date Input - Simple and flexible */
-#contract_date {
-    text-align: right;
-    font-size: 14px;
+/* Date Picker Wrapper */
+.date-picker-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.date-picker-wrapper input {
+    flex: 1;
+    padding-left: 45px !important;
+    cursor: pointer;
+    background-color: #fff;
+}
+
+.date-icon {
+    position: absolute;
+    left: 12px;
+    font-size: 22px;
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.2s;
+}
+
+.date-icon:hover {
+    transform: scale(1.1);
+}
+
+/* Persian Datepicker Custom Styles */
+.pwt-btn-today,
+.pwt-btn-submit {
+    font-family: 'Tahoma', 'Arial', sans-serif !important;
+}
+
+.datepicker-plot-area {
+    direction: rtl !important;
 }
 
 /* Messages */

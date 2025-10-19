@@ -26,7 +26,67 @@ jQuery(document).ready(function($) {
         });
     }
     
-    // No auto-formatting for date - let user type freely
+    // Initialize Persian Datepicker
+    $(document).ready(function() {
+        if (typeof $.fn.persianDatepicker !== 'undefined') {
+            $('#contract_date').persianDatepicker({
+                initialValue: false,
+                format: 'YYYY/MM/DD',
+                autoClose: true,
+                calendar: {
+                    persian: {
+                        locale: 'fa',
+                        showHint: true,
+                        leapYearMode: 'algorithmic'
+                    }
+                },
+                navigator: {
+                    enabled: true,
+                    scroll: {
+                        enabled: true
+                    },
+                    text: {
+                        btnNextText: '>',
+                        btnPrevText: '<'
+                    }
+                },
+                toolbox: {
+                    enabled: true,
+                    calendarSwitch: {
+                        enabled: false
+                    },
+                    todayButton: {
+                        enabled: true,
+                        text: {
+                            fa: 'امروز'
+                        }
+                    },
+                    submitButton: {
+                        enabled: true,
+                        text: {
+                            fa: 'تایید'
+                        }
+                    }
+                },
+                onSelect: function(unix) {
+                    // Get formatted date
+                    var date = new Date(unix);
+                    var persianDate = this.getState().selected.formatted;
+                    $('#contract_date').val(persianDate).trigger('change');
+                    console.log('Date selected:', persianDate);
+                }
+            });
+            
+            // Make the icon clickable too
+            $('.date-icon').on('click', function() {
+                $('#contract_date').focus();
+            });
+            
+            console.log('Persian Datepicker initialized successfully');
+        } else {
+            console.error('Persian Datepicker library not loaded');
+        }
+    });
     
     // Handle form submission
     $('#cooperation-contract-form').on('submit', function(e) {
@@ -89,8 +149,8 @@ jQuery(document).ready(function($) {
             return;
         }
         
-        if (!contractDate || contractDate.length < 8) {
-            $message.html('<div class="error-message">لطفا تاریخ قرارداد را وارد کنید (حداقل 8 کاراکتر).</div>');
+        if (!contractDate || contractDate.trim() === '') {
+            $message.html('<div class="error-message">لطفا تاریخ قرارداد را از تقویم انتخاب کنید.</div>');
             $('#contract_date').focus();
             return;
         }

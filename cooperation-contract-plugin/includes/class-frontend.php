@@ -16,11 +16,37 @@ class Cooperation_Contract_Frontend {
     }
     
     public function enqueue_scripts() {
+        // Enqueue Persian Datepicker CSS
+        wp_enqueue_style(
+            'persian-datepicker-css',
+            COOPERATION_CONTRACT_PLUGIN_URL . 'assets/css/persian-datepicker.min.css',
+            array(),
+            COOPERATION_CONTRACT_VERSION
+        );
+        
         wp_enqueue_style(
             'cooperation-contract-style',
             COOPERATION_CONTRACT_PLUGIN_URL . 'assets/css/style.css',
-            array(),
+            array('persian-datepicker-css'),
             COOPERATION_CONTRACT_VERSION
+        );
+        
+        // Enqueue Persian Date library
+        wp_enqueue_script(
+            'persian-date',
+            COOPERATION_CONTRACT_PLUGIN_URL . 'assets/js/persian-date.min.js',
+            array('jquery'),
+            COOPERATION_CONTRACT_VERSION,
+            true
+        );
+        
+        // Enqueue Persian Datepicker
+        wp_enqueue_script(
+            'persian-datepicker',
+            COOPERATION_CONTRACT_PLUGIN_URL . 'assets/js/persian-datepicker.min.js',
+            array('jquery', 'persian-date'),
+            COOPERATION_CONTRACT_VERSION,
+            true
         );
         
         wp_enqueue_script(
@@ -34,7 +60,7 @@ class Cooperation_Contract_Frontend {
         wp_enqueue_script(
             'cooperation-contract-script',
             COOPERATION_CONTRACT_PLUGIN_URL . 'assets/js/script.js',
-            array('jquery', 'signature-pad'),
+            array('jquery', 'signature-pad', 'persian-datepicker'),
             COOPERATION_CONTRACT_VERSION,
             true
         );
@@ -91,10 +117,14 @@ class Cooperation_Contract_Frontend {
                         
                         <div class="form-group">
                             <label for="contract_date">تاریخ قرارداد (شمسی): <span class="required">*</span></label>
-                            <input type="text" id="contract_date" name="contract_date" 
-                                   placeholder="مثال: 1403/08/01" 
-                                   required>
-                            <small class="field-hint">تاریخ را به هر فرمتی که دوست دارید وارد کنید (مثال: 1403/08/01 یا 1 آبان 1403)</small>
+                            <div class="date-picker-wrapper">
+                                <input type="text" id="contract_date" name="contract_date" 
+                                       placeholder="روی آیکون تقویم کلیک کنید" 
+                                       readonly
+                                       required>
+                                <span class="date-icon">📅</span>
+                            </div>
+                            <small class="field-hint">روی آیکون تقویم کلیک کنید و تاریخ را انتخاب کنید</small>
                         </div>
                     </div>
                     
