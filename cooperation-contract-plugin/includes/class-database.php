@@ -15,25 +15,32 @@ class Cooperation_Contract_Database {
         $table_name = $wpdb->prefix . 'cooperation_contracts';
         $charset_collate = $wpdb->get_charset_collate();
         
-        $sql = "CREATE TABLE IF NOT EXISTS $table_name (
+        $sql = "CREATE TABLE $table_name (
             id mediumint(9) NOT NULL AUTO_INCREMENT,
-            first_name varchar(100) NOT NULL,
-            last_name varchar(100) NOT NULL,
-            national_id varchar(10) NOT NULL,
-            institution_name varchar(255) NOT NULL,
-            position varchar(100) NOT NULL,
+            first_name varchar(100) NOT NULL DEFAULT '',
+            last_name varchar(100) NOT NULL DEFAULT '',
+            national_id varchar(10) NOT NULL DEFAULT '',
+            institution_name varchar(255) NOT NULL DEFAULT '',
+            position varchar(100) NOT NULL DEFAULT '',
             address text NOT NULL,
-            contract_date varchar(100) NOT NULL,
-            selected_plan varchar(50) NOT NULL,
+            contract_date varchar(100) NOT NULL DEFAULT '',
+            selected_plan varchar(50) NOT NULL DEFAULT '',
             signature_data longtext NOT NULL,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
             user_id bigint(20) DEFAULT NULL,
             ip_address varchar(45) DEFAULT NULL,
-            PRIMARY KEY  (id)
+            PRIMARY KEY  (id),
+            KEY national_id (national_id),
+            KEY created_at (created_at)
         ) $charset_collate;";
         
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);
+        
+        // Check if table was created
+        if ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name) {
+            error_log('Failed to create table: ' . $table_name);
+        }
     }
     
     public static function save_contract($data) {
@@ -41,11 +48,18 @@ class Cooperation_Contract_Database {
         
         // Validate data array
         if (!is_array($data) || empty($data)) {
-            error_log('Invalid contract data provided');
+            error_log('CC Error: Invalid contract data provided');
             return false;
         }
         
         $table_name = $wpdb->prefix . 'cooperation_contracts';
+        
+        // Check if table exists
+        if ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name) {
+            error_log('CC Error: Table does not exist: ' . $table_name);
+            // Try to create it
+            self::create_tables();
+        }
         
         // Prepare data with proper sanitization
         $insert_data = array(
@@ -58,14 +72,18 @@ class Cooperation_Contract_Database {
             'contract_date' => isset($data['contract_date']) ? sanitize_text_field($data['contract_date']) : '',
             'selected_plan' => isset($data['selected_plan']) ? sanitize_text_field($data['selected_plan']) : '',
             'signature_data' => isset($data['signature_data']) ? $data['signature_data'] : '',
-            'user_id' => get_current_user_id(),
+            'user_id' => get_current_user_id() ? get_current_user_id() : 0,
             'ip_address' => self::get_user_ip()
         );
         
+        // Log data being inserted (for debugging)
+        error_log('CC Debug: Attempting to insert contract for: ' . $insert_data['first_name'] . ' ' . $insert_data['last_name']);
+        
         // Validate that all required fields are present
-        foreach ($insert_data as $key => $value) {
-            if ($key !== 'user_id' && empty($value)) {
-                error_log("Empty field in contract: $key");
+        $required_fields = array('first_name', 'last_name', 'national_id', 'institution_name', 'position', 'address', 'contract_date', 'selected_plan', 'signature_data');
+        foreach ($required_fields as $field) {
+            if (empty($insert_data[$field])) {
+                error_log("CC Error: Empty required field: $field");
                 return false;
             }
         }
@@ -78,11 +96,15 @@ class Cooperation_Contract_Database {
         );
         
         if ($result === false) {
-            error_log('Database insert failed: ' . $wpdb->last_error);
+            error_log('CC Error: Database insert failed. Error: ' . $wpdb->last_error);
+            error_log('CC Error: Last query: ' . $wpdb->last_query);
             return false;
         }
         
-        return $wpdb->insert_id;
+        $insert_id = $wpdb->insert_id;
+        error_log('CC Success: Contract saved with ID: ' . $insert_id);
+        
+        return $insert_id;
     }
     
     public static function get_contracts($limit = 20, $offset = 0) {
