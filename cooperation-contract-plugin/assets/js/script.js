@@ -26,39 +26,21 @@ jQuery(document).ready(function($) {
         });
     }
     
-    // Initialize Persian date picker
-    setTimeout(function() {
-        if (typeof $.fn.persianDatepicker !== 'undefined') {
-            try {
-                var datepicker = $('#contract_date').persianDatepicker({
-                    format: 'YYYY/MM/DD',
-                    initialValue: false,
-                    autoClose: true,
-                    observer: true,
-                    onSelect: function(timestamp) {
-                        // Make sure the date is set in the input
-                        var dateString = this.getState().selected.formatted;
-                        $('#contract_date').val(dateString);
-                        console.log('Date selected:', dateString);
-                    }
-                });
-                
-                // Also allow clicking the calendar icon to open datepicker
-                $('.calendar-icon').on('click', function() {
-                    $('#contract_date').focus();
-                });
-                
-                console.log('Persian DatePicker initialized successfully');
-            } catch(e) {
-                console.error('Error initializing Persian DatePicker:', e);
-                // If datepicker fails, just allow manual input
-                $('#contract_date').attr('placeholder', '1403/08/01 - وارد کنید');
+    // Add date format helper
+    $('#contract_date').on('input', function() {
+        var value = $(this).val().replace(/[^\d]/g, '');
+        
+        if (value.length >= 4) {
+            var formatted = value.substring(0, 4);
+            if (value.length >= 6) {
+                formatted += '/' + value.substring(4, 6);
+                if (value.length >= 8) {
+                    formatted += '/' + value.substring(6, 8);
+                }
             }
-        } else {
-            console.warn('Persian DatePicker library not loaded - manual input only');
-            $('#contract_date').attr('placeholder', '1403/08/01 - به صورت دستی وارد کنید');
+            $(this).val(formatted);
         }
-    }, 300);
+    });
     
     // Handle form submission
     $('#cooperation-contract-form').on('submit', function(e) {

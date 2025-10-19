@@ -17,25 +17,10 @@ class Cooperation_Contract_Frontend {
     
     public function enqueue_scripts() {
         wp_enqueue_style(
-            'persian-datepicker-style',
-            COOPERATION_CONTRACT_PLUGIN_URL . 'assets/css/persian-datepicker.min.css',
-            array(),
-            COOPERATION_CONTRACT_VERSION
-        );
-        
-        wp_enqueue_style(
             'cooperation-contract-style',
             COOPERATION_CONTRACT_PLUGIN_URL . 'assets/css/style.css',
-            array('persian-datepicker-style'),
+            array(),
             COOPERATION_CONTRACT_VERSION
-        );
-        
-        wp_enqueue_script(
-            'persian-date-picker',
-            COOPERATION_CONTRACT_PLUGIN_URL . 'assets/js/persian-datepicker.min.js',
-            array('jquery'),
-            COOPERATION_CONTRACT_VERSION,
-            true
         );
         
         wp_enqueue_script(
@@ -49,7 +34,7 @@ class Cooperation_Contract_Frontend {
         wp_enqueue_script(
             'cooperation-contract-script',
             COOPERATION_CONTRACT_PLUGIN_URL . 'assets/js/script.js',
-            array('jquery', 'signature-pad', 'persian-date-picker'),
+            array('jquery', 'signature-pad'),
             COOPERATION_CONTRACT_VERSION,
             true
         );
@@ -106,11 +91,12 @@ class Cooperation_Contract_Frontend {
                         
                         <div class="form-group">
                             <label for="contract_date">تاریخ قرارداد (شمسی): <span class="required">*</span></label>
-                            <div class="date-input-wrapper">
-                                <input type="text" id="contract_date" name="contract_date" placeholder="1403/08/01" required>
-                                <span class="calendar-icon" title="انتخاب از تقویم">📅</span>
-                            </div>
-                            <small class="field-hint">روی فیلد یا آیکون تقویم کلیک کنید، یا تاریخ را دستی وارد کنید</small>
+                            <input type="text" id="contract_date" name="contract_date" 
+                                   placeholder="مثال: 1403/08/01" 
+                                   pattern="\d{4}/\d{2}/\d{2}"
+                                   title="فرمت: 1403/08/01"
+                                   required>
+                            <small class="field-hint">تاریخ را به فرمت شمسی وارد کنید: سال/ماه/روز (مثال: 1403/08/01)</small>
                         </div>
                     </div>
                     
