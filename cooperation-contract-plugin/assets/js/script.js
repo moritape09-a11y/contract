@@ -26,20 +26,32 @@ jQuery(document).ready(function($) {
         });
     }
     
-    // Wait for everything to load, then initialize datepicker
-    setTimeout(function() {
-        console.log('Initializing Persian Datepicker...');
+    // Wait for all libraries to load
+    function initializeDatepicker() {
+        console.log('=== Checking libraries ===');
+        console.log('jQuery:', typeof jQuery);
+        console.log('persianDate:', typeof persianDate);
+        console.log('$.fn.persianDatepicker:', typeof $.fn.persianDatepicker);
         
-        if (typeof $.fn.persianDatepicker === 'undefined') {
-            console.error('Persian Datepicker library NOT loaded!');
-            alert('خطا: کتابخانه تقویم لود نشده است. لطفاً صفحه را Refresh کنید (Ctrl+F5)');
+        // Check if persianDate is loaded
+        if (typeof persianDate === 'undefined') {
+            console.error('❌ persianDate library NOT loaded!');
+            setTimeout(initializeDatepicker, 200);
             return;
         }
         
-        console.log('Persian Datepicker library found!');
+        // Check if persianDatepicker is loaded
+        if (typeof $.fn.persianDatepicker === 'undefined') {
+            console.error('❌ Persian Datepicker plugin NOT loaded!');
+            setTimeout(initializeDatepicker, 200);
+            return;
+        }
+        
+        console.log('✅ All libraries loaded!');
+        console.log('Initializing Persian Datepicker...');
         
         try {
-            var datepickerInstance = $('#contract_date').persianDatepicker({
+            $('#contract_date').persianDatepicker({
                 initialValue: false,
                 format: 'YYYY/MM/DD',
                 autoClose: true,
@@ -70,29 +82,32 @@ jQuery(document).ready(function($) {
                 onSelect: function(unix) {
                     var selectedDate = this.getState().selected.formatted;
                     $('#contract_date').val(selectedDate);
-                    console.log('Date selected:', selectedDate);
+                    console.log('✅ Date selected:', selectedDate);
                 }
             });
             
-            console.log('✅ Persian Datepicker initialized successfully!');
+            console.log('🎉 Persian Datepicker initialized successfully!');
             
             // Make icon clickable
             $('.date-icon').on('click', function(e) {
                 e.preventDefault();
-                $('#contract_date').click().focus();
+                console.log('Icon clicked!');
+                $('#contract_date').focus();
             });
             
-            // Test click
-            $('#contract_date').on('click', function() {
-                console.log('Date field clicked!');
+            // Log when field is clicked
+            $('#contract_date').on('focus', function() {
+                console.log('📅 Date field focused!');
             });
             
         } catch(error) {
-            console.error('Error initializing datepicker:', error);
-            alert('خطا در راه‌اندازی تقویم: ' + error.message);
+            console.error('❌ Error initializing datepicker:', error);
+            console.error('Error details:', error.message);
         }
-        
-    }, 500);
+    }
+    
+    // Start initialization after a delay
+    setTimeout(initializeDatepicker, 1000);
     
     // Handle form submission
     $('#cooperation-contract-form').on('submit', function(e) {

@@ -31,22 +31,22 @@ class Cooperation_Contract_Frontend {
             COOPERATION_CONTRACT_VERSION
         );
         
-        // Enqueue Persian Date library
+        // Enqueue Persian Date library FIRST (very important!)
         wp_enqueue_script(
             'persian-date',
             COOPERATION_CONTRACT_PLUGIN_URL . 'assets/js/persian-date.min.js',
             array('jquery'),
             COOPERATION_CONTRACT_VERSION,
-            true
+            false  // Load in header to ensure it's available
         );
         
-        // Enqueue Persian Datepicker
+        // Enqueue Persian Datepicker SECOND (depends on persian-date)
         wp_enqueue_script(
             'persian-datepicker',
             COOPERATION_CONTRACT_PLUGIN_URL . 'assets/js/persian-datepicker.min.js',
             array('jquery', 'persian-date'),
             COOPERATION_CONTRACT_VERSION,
-            true
+            false  // Load in header
         );
         
         wp_enqueue_script(
@@ -57,10 +57,11 @@ class Cooperation_Contract_Frontend {
             true
         );
         
+        // Our script LAST (depends on all above)
         wp_enqueue_script(
             'cooperation-contract-script',
             COOPERATION_CONTRACT_PLUGIN_URL . 'assets/js/script.js',
-            array('jquery', 'signature-pad', 'persian-datepicker'),
+            array('jquery', 'persian-date', 'persian-datepicker', 'signature-pad'),
             COOPERATION_CONTRACT_VERSION,
             true
         );
