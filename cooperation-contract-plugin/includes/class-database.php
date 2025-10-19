@@ -23,7 +23,7 @@ class Cooperation_Contract_Database {
             institution_name varchar(255) NOT NULL,
             position varchar(100) NOT NULL,
             address text NOT NULL,
-            contract_date varchar(50) NOT NULL,
+            contract_date varchar(100) NOT NULL,
             selected_plan varchar(50) NOT NULL,
             signature_data longtext NOT NULL,
             created_at datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,

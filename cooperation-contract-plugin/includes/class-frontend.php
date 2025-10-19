@@ -93,10 +93,8 @@ class Cooperation_Contract_Frontend {
                             <label for="contract_date">تاریخ قرارداد (شمسی): <span class="required">*</span></label>
                             <input type="text" id="contract_date" name="contract_date" 
                                    placeholder="مثال: 1403/08/01" 
-                                   pattern="\d{4}/\d{2}/\d{2}"
-                                   title="فرمت: 1403/08/01"
                                    required>
-                            <small class="field-hint">تاریخ را به فرمت شمسی وارد کنید: سال/ماه/روز (مثال: 1403/08/01)</small>
+                            <small class="field-hint">تاریخ را به هر فرمتی که دوست دارید وارد کنید (مثال: 1403/08/01 یا 1 آبان 1403)</small>
                         </div>
                     </div>
                     
@@ -159,6 +157,12 @@ class Cooperation_Contract_Frontend {
         // Validate national ID (10 digits)
         if (!preg_match('/^[0-9]{10}$/', $_POST['national_id'])) {
             wp_send_json_error(array('message' => 'کد ملی باید 10 رقم باشد.'));
+            return;
+        }
+        
+        // Validate date (at least 8 characters)
+        if (strlen($_POST['contract_date']) < 8) {
+            wp_send_json_error(array('message' => 'تاریخ قرارداد باید حداقل 8 کاراکتر باشد.'));
             return;
         }
         

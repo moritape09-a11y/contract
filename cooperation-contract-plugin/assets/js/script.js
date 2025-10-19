@@ -26,21 +26,7 @@ jQuery(document).ready(function($) {
         });
     }
     
-    // Add date format helper
-    $('#contract_date').on('input', function() {
-        var value = $(this).val().replace(/[^\d]/g, '');
-        
-        if (value.length >= 4) {
-            var formatted = value.substring(0, 4);
-            if (value.length >= 6) {
-                formatted += '/' + value.substring(4, 6);
-                if (value.length >= 8) {
-                    formatted += '/' + value.substring(6, 8);
-                }
-            }
-            $(this).val(formatted);
-        }
-    });
+    // No auto-formatting for date - let user type freely
     
     // Handle form submission
     $('#cooperation-contract-form').on('submit', function(e) {
@@ -103,8 +89,8 @@ jQuery(document).ready(function($) {
             return;
         }
         
-        if (!contractDate) {
-            $message.html('<div class="error-message">لطفا تاریخ قرارداد را وارد کنید.</div>');
+        if (!contractDate || contractDate.length < 8) {
+            $message.html('<div class="error-message">لطفا تاریخ قرارداد را وارد کنید (حداقل 8 کاراکتر).</div>');
             $('#contract_date').focus();
             return;
         }
