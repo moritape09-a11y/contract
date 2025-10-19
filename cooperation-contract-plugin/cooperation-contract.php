@@ -16,9 +16,15 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('COOPERATION_CONTRACT_VERSION', '1.0.0');
-define('COOPERATION_CONTRACT_PLUGIN_DIR', plugin_dir_path(__FILE__));
-define('COOPERATION_CONTRACT_PLUGIN_URL', plugin_dir_url(__FILE__));
+if (!defined('COOPERATION_CONTRACT_VERSION')) {
+    define('COOPERATION_CONTRACT_VERSION', '3.0.1');
+}
+if (!defined('COOPERATION_CONTRACT_PLUGIN_DIR')) {
+    define('COOPERATION_CONTRACT_PLUGIN_DIR', plugin_dir_path(__FILE__));
+}
+if (!defined('COOPERATION_CONTRACT_PLUGIN_URL')) {
+    define('COOPERATION_CONTRACT_PLUGIN_URL', plugin_dir_url(__FILE__));
+}
 
 // Include required files
 require_once COOPERATION_CONTRACT_PLUGIN_DIR . 'includes/class-database.php';

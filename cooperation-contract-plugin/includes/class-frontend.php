@@ -155,40 +155,99 @@ class Cooperation_Contract_Frontend {
     }
     
     public function ajax_save_contract() {
-        check_ajax_referer('cooperation_contract_nonce', 'nonce');
+        // Verify nonce
+        if (!check_ajax_referer('cooperation_contract_nonce', 'nonce', false)) {
+            wp_send_json_error(array('message' => 'خطای امنیتی. لطفاً صفحه را Refresh کنید.'));
+            return;
+        }
         
         // Validate required fields
         $required_fields = array('first_name', 'last_name', 'national_id', 'institution_name', 'position', 'address', 'contract_date', 'selected_plan', 'signature_data');
         
         foreach ($required_fields as $field) {
-            if (empty($_POST[$field])) {
+            if (!isset($_POST[$field]) || empty(trim($_POST[$field]))) {
                 wp_send_json_error(array('message' => 'لطفا تمام فیلدها را پر کنید.'));
                 return;
             }
         }
         
-        // Validate national ID (10 digits)
-        if (!preg_match('/^[0-9]{10}$/', $_POST['national_id'])) {
-            wp_send_json_error(array('message' => 'کد ملی باید 10 رقم باشد.'));
+        // Validate and sanitize national ID
+        $national_id = sanitize_text_field($_POST['national_id']);
+        if (!preg_match('/^\d{10}$/', $national_id)) {
+            wp_send_json_error(array('message' => 'کد ملی باید دقیقاً 10 رقم باشد.'));
             return;
         }
         
-        // Validate date (at least 8 characters)
-        if (strlen($_POST['contract_date']) < 8) {
-            wp_send_json_error(array('message' => 'تاریخ قرارداد باید حداقل 8 کاراکتر باشد.'));
+        // Validate contract date format (YYYY/MM/DD)
+        $contract_date = sanitize_text_field($_POST['contract_date']);
+        if (!preg_match('/^\d{4}\/\d{2}\/\d{2}$/', $contract_date)) {
+            wp_send_json_error(array('message' => 'فرمت تاریخ نامعتبر است. فرمت صحیح: 1403/08/01'));
             return;
         }
+        
+        // Validate signature data
+        $signature_data = $_POST['signature_data'];
+        if (!preg_match('/^data:image\/png;base64,/', $signature_data)) {
+            wp_send_json_error(array('message' => 'فرمت امضا نامعتبر است.'));
+            return;
+        }
+        
+        // Check signature size (max 5MB)
+        if (strlen($signature_data) > 5000000) {
+            wp_send_json_error(array('message' => 'حجم امضا خیلی زیاد است.'));
+            return;
+        }
+        
+        // Validate selected plan
+        $valid_plans = array('طرح سایت', 'طرح گروه', 'طرح طلایی');
+        if (!in_array($_POST['selected_plan'], $valid_plans, true)) {
+            wp_send_json_error(array('message' => 'طرح انتخابی نامعتبر است.'));
+            return;
+        }
+        
+        // Additional validation for text fields
+        $first_name = sanitize_text_field($_POST['first_name']);
+        $last_name = sanitize_text_field($_POST['last_name']);
+        
+        if (strlen($first_name) < 2 || strlen($first_name) > 50) {
+            wp_send_json_error(array('message' => 'نام باید بین 2 تا 50 کاراکتر باشد.'));
+            return;
+        }
+        
+        if (strlen($last_name) < 2 || strlen($last_name) > 50) {
+            wp_send_json_error(array('message' => 'نام خانوادگی باید بین 2 تا 50 کاراکتر باشد.'));
+            return;
+        }
+        
+        // Prepare data for saving
+        $safe_data = array(
+            'first_name' => $first_name,
+            'last_name' => $last_name,
+            'national_id' => $national_id,
+            'institution_name' => sanitize_text_field($_POST['institution_name']),
+            'position' => sanitize_text_field($_POST['position']),
+            'address' => sanitize_textarea_field($_POST['address']),
+            'contract_date' => $contract_date,
+            'selected_plan' => sanitize_text_field($_POST['selected_plan']),
+            'signature_data' => $signature_data
+        );
         
         // Save contract
-        $contract_id = Cooperation_Contract_Database::save_contract($_POST);
+        $contract_id = Cooperation_Contract_Database::save_contract($safe_data);
         
         if ($contract_id) {
+            // Log success (optional)
+            error_log(sprintf('Contract saved successfully. ID: %d, User: %s', $contract_id, $first_name . ' ' . $last_name));
+            
             wp_send_json_success(array(
-                'message' => '<strong>قرارداد همکاری به‌صورت رسمی و قانونی تنظیم و امضا گردید.</strong><br>قرارداد با شماره ' . $contract_id . ' ذخیره شد.',
+                'message' => '<strong>قرارداد همکاری به‌صورت رسمی و قانونی تنظیم و امضا گردید.</strong><br>قرارداد با شماره ' . esc_html($contract_id) . ' ذخیره شد.',
                 'contract_id' => $contract_id
             ));
         } else {
-            wp_send_json_error(array('message' => 'خطا در ثبت قرارداد. لطفا دوباره تلاش کنید.'));
+            // Log error
+            error_log('Failed to save contract for: ' . $first_name . ' ' . $last_name);
+            
+            wp_send_json_error(array('message' => 'خطا در ثبت قرارداد در دیتابیس. لطفا دوباره تلاش کنید.'));
         }
     }
 }

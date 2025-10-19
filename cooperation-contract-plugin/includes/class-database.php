@@ -39,27 +39,50 @@ class Cooperation_Contract_Database {
     public static function save_contract($data) {
         global $wpdb;
         
+        // Validate data array
+        if (!is_array($data) || empty($data)) {
+            error_log('Invalid contract data provided');
+            return false;
+        }
+        
         $table_name = $wpdb->prefix . 'cooperation_contracts';
         
+        // Prepare data with proper sanitization
+        $insert_data = array(
+            'first_name' => isset($data['first_name']) ? sanitize_text_field($data['first_name']) : '',
+            'last_name' => isset($data['last_name']) ? sanitize_text_field($data['last_name']) : '',
+            'national_id' => isset($data['national_id']) ? sanitize_text_field($data['national_id']) : '',
+            'institution_name' => isset($data['institution_name']) ? sanitize_text_field($data['institution_name']) : '',
+            'position' => isset($data['position']) ? sanitize_text_field($data['position']) : '',
+            'address' => isset($data['address']) ? sanitize_textarea_field($data['address']) : '',
+            'contract_date' => isset($data['contract_date']) ? sanitize_text_field($data['contract_date']) : '',
+            'selected_plan' => isset($data['selected_plan']) ? sanitize_text_field($data['selected_plan']) : '',
+            'signature_data' => isset($data['signature_data']) ? $data['signature_data'] : '',
+            'user_id' => get_current_user_id(),
+            'ip_address' => self::get_user_ip()
+        );
+        
+        // Validate that all required fields are present
+        foreach ($insert_data as $key => $value) {
+            if ($key !== 'user_id' && empty($value)) {
+                error_log("Empty field in contract: $key");
+                return false;
+            }
+        }
+        
+        // Insert with proper format specifiers
         $result = $wpdb->insert(
             $table_name,
-            array(
-                'first_name' => sanitize_text_field($data['first_name']),
-                'last_name' => sanitize_text_field($data['last_name']),
-                'national_id' => sanitize_text_field($data['national_id']),
-                'institution_name' => sanitize_text_field($data['institution_name']),
-                'position' => sanitize_text_field($data['position']),
-                'address' => sanitize_textarea_field($data['address']),
-                'contract_date' => sanitize_text_field($data['contract_date']),
-                'selected_plan' => sanitize_text_field($data['selected_plan']),
-                'signature_data' => $data['signature_data'],
-                'user_id' => get_current_user_id(),
-                'ip_address' => self::get_user_ip()
-            ),
+            $insert_data,
             array('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s')
         );
         
-        return $result !== false ? $wpdb->insert_id : false;
+        if ($result === false) {
+            error_log('Database insert failed: ' . $wpdb->last_error);
+            return false;
+        }
+        
+        return $wpdb->insert_id;
     }
     
     public static function get_contracts($limit = 20, $offset = 0) {
@@ -102,12 +125,29 @@ class Cooperation_Contract_Database {
     }
     
     private static function get_user_ip() {
-        if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-            return $_SERVER['HTTP_CLIENT_IP'];
+        $ip = '';
+        
+        if (!empty($_SERVER['HTTP_CLIENT_IP']) && filter_var($_SERVER['HTTP_CLIENT_IP'], FILTER_VALIDATE_IP)) {
+            $ip = $_SERVER['HTTP_CLIENT_IP'];
         } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            return $_SERVER['HTTP_X_FORWARDED_FOR'];
-        } else {
-            return $_SERVER['REMOTE_ADDR'];
+            // X-Forwarded-For can contain multiple IPs, get the first one
+            $ips = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+            $ip = trim($ips[0]);
+            
+            if (!filter_var($ip, FILTER_VALIDATE_IP)) {
+                $ip = '';
+            }
         }
+        
+        if (empty($ip) && !empty($_SERVER['REMOTE_ADDR'])) {
+            $ip = $_SERVER['REMOTE_ADDR'];
+        }
+        
+        // Validate final IP
+        if (!filter_var($ip, FILTER_VALIDATE_IP)) {
+            $ip = '0.0.0.0';
+        }
+        
+        return sanitize_text_field($ip);
     }
 }
