@@ -221,6 +221,28 @@
     font-style: italic;
 }
 
+/* Date Input Wrapper */
+.date-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.date-input-wrapper input {
+    flex: 1;
+    padding-left: 45px !important;
+}
+
+.calendar-icon {
+    position: absolute;
+    left: 12px;
+    font-size: 20px;
+    cursor: pointer;
+    user-select: none;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
 /* Messages */
 #form-message {
     margin-top: 20px;

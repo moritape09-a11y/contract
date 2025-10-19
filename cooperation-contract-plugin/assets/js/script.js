@@ -29,18 +29,36 @@ jQuery(document).ready(function($) {
     // Initialize Persian date picker
     setTimeout(function() {
         if (typeof $.fn.persianDatepicker !== 'undefined') {
-            $('#contract_date').persianDatepicker({
-                format: 'YYYY/MM/DD',
-                initialValue: false,
-                autoClose: true,
-                observer: true,
-                altField: '#contract_date',
-                altFormat: 'YYYY/MM/DD'
-            });
+            try {
+                var datepicker = $('#contract_date').persianDatepicker({
+                    format: 'YYYY/MM/DD',
+                    initialValue: false,
+                    autoClose: true,
+                    observer: true,
+                    onSelect: function(timestamp) {
+                        // Make sure the date is set in the input
+                        var dateString = this.getState().selected.formatted;
+                        $('#contract_date').val(dateString);
+                        console.log('Date selected:', dateString);
+                    }
+                });
+                
+                // Also allow clicking the calendar icon to open datepicker
+                $('.calendar-icon').on('click', function() {
+                    $('#contract_date').focus();
+                });
+                
+                console.log('Persian DatePicker initialized successfully');
+            } catch(e) {
+                console.error('Error initializing Persian DatePicker:', e);
+                // If datepicker fails, just allow manual input
+                $('#contract_date').attr('placeholder', '1403/08/01 - وارد کنید');
+            }
         } else {
-            console.error('Persian DatePicker not loaded!');
+            console.warn('Persian DatePicker library not loaded - manual input only');
+            $('#contract_date').attr('placeholder', '1403/08/01 - به صورت دستی وارد کنید');
         }
-    }, 100);
+    }, 300);
     
     // Handle form submission
     $('#cooperation-contract-form').on('submit', function(e) {
@@ -49,6 +67,70 @@ jQuery(document).ready(function($) {
         var $form = $(this);
         var $message = $('#form-message');
         var $submitBtn = $form.find('button[type="submit"]');
+        
+        // Get all form values
+        var firstName = $('#first_name').val().trim();
+        var lastName = $('#last_name').val().trim();
+        var nationalId = $('#national_id').val().trim();
+        var institutionName = $('#institution_name').val().trim();
+        var position = $('#position').val().trim();
+        var address = $('#address').val().trim();
+        var contractDate = $('#contract_date').val().trim();
+        var selectedPlan = $('input[name="selected_plan"]:checked').val();
+        
+        // Validate all required fields
+        if (!firstName) {
+            $message.html('<div class="error-message">لطفا نام خود را وارد کنید.</div>');
+            $('#first_name').focus();
+            return;
+        }
+        
+        if (!lastName) {
+            $message.html('<div class="error-message">لطفا نام خانوادگی خود را وارد کنید.</div>');
+            $('#last_name').focus();
+            return;
+        }
+        
+        if (!nationalId) {
+            $message.html('<div class="error-message">لطفا کد ملی خود را وارد کنید.</div>');
+            $('#national_id').focus();
+            return;
+        }
+        
+        if (nationalId.length !== 10 || !/^\d{10}$/.test(nationalId)) {
+            $message.html('<div class="error-message">کد ملی باید دقیقاً 10 رقم باشد.</div>');
+            $('#national_id').focus();
+            return;
+        }
+        
+        if (!institutionName) {
+            $message.html('<div class="error-message">لطفا نام آموزشگاه را وارد کنید.</div>');
+            $('#institution_name').focus();
+            return;
+        }
+        
+        if (!position) {
+            $message.html('<div class="error-message">لطفا سمت/عنوان خود را وارد کنید.</div>');
+            $('#position').focus();
+            return;
+        }
+        
+        if (!address) {
+            $message.html('<div class="error-message">لطفا آدرس را وارد کنید.</div>');
+            $('#address').focus();
+            return;
+        }
+        
+        if (!contractDate) {
+            $message.html('<div class="error-message">لطفا تاریخ قرارداد را وارد کنید.</div>');
+            $('#contract_date').focus();
+            return;
+        }
+        
+        if (!selectedPlan) {
+            $message.html('<div class="error-message">لطفا یکی از طرح‌ها را انتخاب کنید.</div>');
+            return;
+        }
         
         // Check if signature is empty
         if (signaturePad.isEmpty()) {
@@ -63,16 +145,19 @@ jQuery(document).ready(function($) {
         var formData = {
             action: 'save_cooperation_contract',
             nonce: cooperationContract.nonce,
-            first_name: $('#first_name').val(),
-            last_name: $('#last_name').val(),
-            national_id: $('#national_id').val(),
-            institution_name: $('#institution_name').val(),
-            position: $('#position').val(),
-            address: $('#address').val(),
-            contract_date: $('#contract_date').val(),
-            selected_plan: $('input[name="selected_plan"]:checked').val(),
+            first_name: firstName,
+            last_name: lastName,
+            national_id: nationalId,
+            institution_name: institutionName,
+            position: position,
+            address: address,
+            contract_date: contractDate,
+            selected_plan: selectedPlan,
             signature_data: signatureData
         };
+        
+        // Debug log (can be removed in production)
+        console.log('Sending form data:', formData);
         
         // Disable submit button
         $submitBtn.prop('disabled', true).text('در حال ثبت...');
