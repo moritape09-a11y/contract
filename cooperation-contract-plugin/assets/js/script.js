@@ -120,6 +120,13 @@ jQuery(document).ready(function($) {
     // Attach date converter
     $('#miladi_date').on('change', convertDate);
     
+    // Also trigger on blur to make sure it's converted
+    $('#miladi_date').on('blur', function() {
+        if ($(this).val() && !$('#contract_date').val()) {
+            convertDate();
+        }
+    });
+    
     // Form validation and submission
     $('#cooperation-contract-form').on('submit', function(e) {
         e.preventDefault();
@@ -185,10 +192,25 @@ jQuery(document).ready(function($) {
             return;
         }
         
-        if (!formValues.contractDate || !$('#contract_date').attr('data-converted')) {
-            showError('لطفا منتظر بمانید تا تاریخ تبدیل شود یا دوباره تاریخ را انتخاب کنید.', '#miladi_date');
-            // Try to convert again
-            convertDate();
+        if (!formValues.miladiDate) {
+            showError('لطفا تاریخ میلادی را انتخاب کنید.', '#miladi_date');
+            return;
+        }
+        
+        if (!formValues.contractDate) {
+            showError('در حال تبدیل تاریخ... لطفاً یک لحظه صبر کنید.', '#miladi_date');
+            // Try to convert
+            setTimeout(function() {
+                convertDate();
+                // Try submit again after 500ms
+                setTimeout(function() {
+                    if ($('#contract_date').val()) {
+                        $('#cooperation-contract-form').submit();
+                    } else {
+                        showError('خطا در تبدیل تاریخ. لطفاً دوباره تاریخ را انتخاب کنید.', '#miladi_date');
+                    }
+                }, 500);
+            }, 100);
             return;
         }
         

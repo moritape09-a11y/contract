@@ -178,12 +178,15 @@ class Cooperation_Contract_Frontend {
             return;
         }
         
-        // Validate contract date format (YYYY/MM/DD)
+        // Validate contract date
         $contract_date = sanitize_text_field($_POST['contract_date']);
-        if (!preg_match('/^\d{4}\/\d{2}\/\d{2}$/', $contract_date)) {
-            wp_send_json_error(array('message' => 'فرمت تاریخ نامعتبر است. فرمت صحیح: 1403/08/01'));
+        if (strlen($contract_date) < 8) {
+            wp_send_json_error(array('message' => 'لطفاً تاریخ قرارداد را انتخاب کنید.'));
             return;
         }
+        
+        // Optional: Log date for debugging (can be removed)
+        error_log('Contract date received: ' . $contract_date);
         
         // Validate signature data
         $signature_data = $_POST['signature_data'];
