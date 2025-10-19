@@ -212,20 +212,31 @@
     background: #e0e0e0;
 }
 
+/* Field Hints */
+.field-hint {
+    display: block;
+    color: #666;
+    font-size: 12px;
+    margin-top: 5px;
+    font-style: italic;
+}
+
 /* Messages */
 #form-message {
     margin-top: 20px;
 }
 
 .success-message {
-    background: #d4edda;
-    border: 1px solid #c3e6cb;
-    color: #155724;
-    padding: 15px;
-    border-radius: 6px;
+    background: #28a745;
+    border: 2px solid #1e7e34;
+    color: #fff;
+    padding: 20px 25px;
+    border-radius: 8px;
     margin-bottom: 20px;
     text-align: center;
-    font-weight: bold;
+    font-size: 16px;
+    line-height: 1.6;
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
 }
 
 .error-message {

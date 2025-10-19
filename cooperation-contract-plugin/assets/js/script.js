@@ -27,33 +27,20 @@ jQuery(document).ready(function($) {
     }
     
     // Initialize Persian date picker
-    if (typeof $.fn.persianDatepicker !== 'undefined') {
-        $('.persian-datepicker').persianDatepicker({
-            format: 'YYYY/MM/DD',
-            initialValue: false,
-            autoClose: true,
-            calendar: {
-                persian: {
-                    locale: 'fa'
-                }
-            },
-            navigator: {
-                enabled: true,
-                text: {
-                    btnNextText: '<',
-                    btnPrevText: '>'
-                }
-            },
-            toolbox: {
-                calendarSwitch: {
-                    enabled: false
-                }
-            },
-            onSelect: function(unix) {
-                // Date selected
-            }
-        });
-    }
+    setTimeout(function() {
+        if (typeof $.fn.persianDatepicker !== 'undefined') {
+            $('#contract_date').persianDatepicker({
+                format: 'YYYY/MM/DD',
+                initialValue: false,
+                autoClose: true,
+                observer: true,
+                altField: '#contract_date',
+                altFormat: 'YYYY/MM/DD'
+            });
+        } else {
+            console.error('Persian DatePicker not loaded!');
+        }
+    }, 100);
     
     // Handle form submission
     $('#cooperation-contract-form').on('submit', function(e) {
@@ -78,6 +65,7 @@ jQuery(document).ready(function($) {
             nonce: cooperationContract.nonce,
             first_name: $('#first_name').val(),
             last_name: $('#last_name').val(),
+            national_id: $('#national_id').val(),
             institution_name: $('#institution_name').val(),
             position: $('#position').val(),
             address: $('#address').val(),

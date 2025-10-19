@@ -87,24 +87,32 @@ class Cooperation_Contract_Frontend {
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="institution_name">نام آموزشگاه: <span class="required">*</span></label>
-                            <input type="text" id="institution_name" name="institution_name" required>
+                            <label for="national_id">کد ملی: <span class="required">*</span></label>
+                            <input type="text" id="national_id" name="national_id" pattern="[0-9]{10}" maxlength="10" placeholder="1234567890" required>
+                            <small class="field-hint">کد ملی 10 رقمی</small>
                         </div>
                         
                         <div class="form-group">
+                            <label for="institution_name">نام آموزشگاه: <span class="required">*</span></label>
+                            <input type="text" id="institution_name" name="institution_name" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
                             <label for="position">سمت/عنوان: <span class="required">*</span></label>
                             <input type="text" id="position" name="position" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="contract_date">تاریخ قرارداد (شمسی): <span class="required">*</span></label>
+                            <input type="text" id="contract_date" name="contract_date" placeholder="1403/08/01" required>
                         </div>
                     </div>
                     
                     <div class="form-group">
                         <label for="address">آدرس: <span class="required">*</span></label>
                         <textarea id="address" name="address" rows="3" required></textarea>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="contract_date">تاریخ قرارداد (شمسی): <span class="required">*</span></label>
-                        <input type="text" id="contract_date" name="contract_date" class="persian-datepicker" required readonly>
                     </div>
                     
                     <div class="form-group">
@@ -149,7 +157,7 @@ class Cooperation_Contract_Frontend {
         check_ajax_referer('cooperation_contract_nonce', 'nonce');
         
         // Validate required fields
-        $required_fields = array('first_name', 'last_name', 'institution_name', 'position', 'address', 'contract_date', 'selected_plan', 'signature_data');
+        $required_fields = array('first_name', 'last_name', 'national_id', 'institution_name', 'position', 'address', 'contract_date', 'selected_plan', 'signature_data');
         
         foreach ($required_fields as $field) {
             if (empty($_POST[$field])) {
@@ -158,12 +166,18 @@ class Cooperation_Contract_Frontend {
             }
         }
         
+        // Validate national ID (10 digits)
+        if (!preg_match('/^[0-9]{10}$/', $_POST['national_id'])) {
+            wp_send_json_error(array('message' => 'کد ملی باید 10 رقم باشد.'));
+            return;
+        }
+        
         // Save contract
         $contract_id = Cooperation_Contract_Database::save_contract($_POST);
         
         if ($contract_id) {
             wp_send_json_success(array(
-                'message' => 'قرارداد با موفقیت ثبت شد.',
+                'message' => '<strong>قرارداد همکاری به‌صورت رسمی و قانونی تنظیم و امضا گردید.</strong><br>قرارداد با شماره ' . $contract_id . ' ذخیره شد.',
                 'contract_id' => $contract_id
             ));
         } else {

@@ -19,6 +19,7 @@ class Cooperation_Contract_Database {
             id mediumint(9) NOT NULL AUTO_INCREMENT,
             first_name varchar(100) NOT NULL,
             last_name varchar(100) NOT NULL,
+            national_id varchar(10) NOT NULL,
             institution_name varchar(255) NOT NULL,
             position varchar(100) NOT NULL,
             address text NOT NULL,
@@ -45,6 +46,7 @@ class Cooperation_Contract_Database {
             array(
                 'first_name' => sanitize_text_field($data['first_name']),
                 'last_name' => sanitize_text_field($data['last_name']),
+                'national_id' => sanitize_text_field($data['national_id']),
                 'institution_name' => sanitize_text_field($data['institution_name']),
                 'position' => sanitize_text_field($data['position']),
                 'address' => sanitize_textarea_field($data['address']),
@@ -54,7 +56,7 @@ class Cooperation_Contract_Database {
                 'user_id' => get_current_user_id(),
                 'ip_address' => self::get_user_ip()
             ),
-            array('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s')
+            array('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s')
         );
         
         return $result !== false ? $wpdb->insert_id : false;

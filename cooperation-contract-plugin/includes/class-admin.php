@@ -60,6 +60,7 @@ class Cooperation_Contract_Admin {
                     <tr>
                         <th>شناسه</th>
                         <th>نام و نام خانوادگی</th>
+                        <th>کد ملی</th>
                         <th>آموزشگاه</th>
                         <th>طرح انتخابی</th>
                         <th>تاریخ قرارداد</th>
@@ -70,13 +71,14 @@ class Cooperation_Contract_Admin {
                 <tbody>
                     <?php if (empty($contracts)): ?>
                         <tr>
-                            <td colspan="7" style="text-align: center;">هیچ قراردادی ثبت نشده است.</td>
+                            <td colspan="8" style="text-align: center;">هیچ قراردادی ثبت نشده است.</td>
                         </tr>
                     <?php else: ?>
                         <?php foreach ($contracts as $contract): ?>
                             <tr>
                                 <td><?php echo esc_html($contract->id); ?></td>
                                 <td><?php echo esc_html($contract->first_name . ' ' . $contract->last_name); ?></td>
+                                <td><?php echo esc_html($contract->national_id); ?></td>
                                 <td><?php echo esc_html($contract->institution_name); ?></td>
                                 <td><?php echo esc_html($contract->selected_plan); ?></td>
                                 <td><?php echo esc_html($contract->contract_date); ?></td>
@@ -108,6 +110,10 @@ class Cooperation_Contract_Admin {
                         <tr>
                             <th>نام خانوادگی:</th>
                             <td><?php echo esc_html($contract->last_name); ?></td>
+                        </tr>
+                        <tr>
+                            <th>کد ملی:</th>
+                            <td><?php echo esc_html($contract->national_id); ?></td>
                         </tr>
                         <tr>
                             <th>نام آموزشگاه:</th>
