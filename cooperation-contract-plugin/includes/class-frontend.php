@@ -16,37 +16,20 @@ class Cooperation_Contract_Frontend {
     }
     
     public function enqueue_scripts() {
-        // Enqueue Persian Datepicker CSS
         wp_enqueue_style(
-            'persian-datepicker-css',
-            COOPERATION_CONTRACT_PLUGIN_URL . 'assets/css/persian-datepicker.min.css',
+            'cooperation-contract-style',
+            COOPERATION_CONTRACT_PLUGIN_URL . 'assets/css/style.css',
             array(),
             COOPERATION_CONTRACT_VERSION
         );
         
-        wp_enqueue_style(
-            'cooperation-contract-style',
-            COOPERATION_CONTRACT_PLUGIN_URL . 'assets/css/style.css',
-            array('persian-datepicker-css'),
-            COOPERATION_CONTRACT_VERSION
-        );
-        
-        // Enqueue Persian Date library FIRST (very important!)
+        // Enqueue Persian Date library from CDN
         wp_enqueue_script(
             'persian-date',
-            COOPERATION_CONTRACT_PLUGIN_URL . 'assets/js/persian-date.min.js',
+            'https://cdn.jsdelivr.net/npm/persian-date@1.1.0/dist/persian-date.js',
             array('jquery'),
-            COOPERATION_CONTRACT_VERSION,
-            false  // Load in header to ensure it's available
-        );
-        
-        // Enqueue Persian Datepicker SECOND (depends on persian-date)
-        wp_enqueue_script(
-            'persian-datepicker',
-            COOPERATION_CONTRACT_PLUGIN_URL . 'assets/js/persian-datepicker.min.js',
-            array('jquery', 'persian-date'),
-            COOPERATION_CONTRACT_VERSION,
-            false  // Load in header
+            '1.1.0',
+            true
         );
         
         wp_enqueue_script(
@@ -57,11 +40,10 @@ class Cooperation_Contract_Frontend {
             true
         );
         
-        // Our script LAST (depends on all above)
         wp_enqueue_script(
             'cooperation-contract-script',
             COOPERATION_CONTRACT_PLUGIN_URL . 'assets/js/script.js',
-            array('jquery', 'persian-date', 'persian-datepicker', 'signature-pad'),
+            array('jquery', 'persian-date', 'signature-pad'),
             COOPERATION_CONTRACT_VERSION,
             true
         );
@@ -117,18 +99,15 @@ class Cooperation_Contract_Frontend {
                         </div>
                         
                         <div class="form-group">
-                            <label for="contract_date">تاریخ قرارداد (شمسی): <span class="required">*</span></label>
-                            <div class="date-picker-wrapper">
-                                <input type="text" 
-                                       id="contract_date" 
-                                       name="contract_date" 
-                                       class="contract-date-input"
-                                       placeholder="روی اینجا یا آیکون کلیک کنید" 
-                                       autocomplete="off"
-                                       required>
-                                <span class="date-icon" title="باز کردن تقویم">📅</span>
-                            </div>
-                            <small class="field-hint">⬆️ روی فیلد یا آیکون کلیک کنید تا تقویم باز شود</small>
+                            <label for="miladi_date">تاریخ قرارداد: <span class="required">*</span></label>
+                            <input type="date" 
+                                   id="miladi_date" 
+                                   name="miladi_date"
+                                   style="padding: 10px 15px; width: 100%; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;"
+                                   required>
+                            <input type="hidden" id="contract_date" name="contract_date" required>
+                            <div id="jalali_result" style="margin-top: 8px; padding: 8px; background: #e8f4f8; border-radius: 4px; font-weight: bold; color: #0073aa; display: none;"></div>
+                            <small class="field-hint">تاریخ میلادی را انتخاب کنید، معادل شمسی خودکار نمایش داده می‌شود</small>
                         </div>
                     </div>
                     

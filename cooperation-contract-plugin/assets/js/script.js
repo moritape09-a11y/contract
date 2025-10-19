@@ -26,88 +26,33 @@ jQuery(document).ready(function($) {
         });
     }
     
-    // Wait for all libraries to load
-    function initializeDatepicker() {
-        console.log('=== Checking libraries ===');
-        console.log('jQuery:', typeof jQuery);
-        console.log('persianDate:', typeof persianDate);
-        console.log('$.fn.persianDatepicker:', typeof $.fn.persianDatepicker);
+    // Miladi to Jalali converter
+    $('#miladi_date').on('change', function() {
+        const miladiDate = $(this).val();
         
-        // Check if persianDate is loaded
-        if (typeof persianDate === 'undefined') {
-            console.error('❌ persianDate library NOT loaded!');
-            setTimeout(initializeDatepicker, 200);
+        if (!miladiDate) {
+            $('#jalali_result').hide();
+            $('#contract_date').val('');
             return;
         }
-        
-        // Check if persianDatepicker is loaded
-        if (typeof $.fn.persianDatepicker === 'undefined') {
-            console.error('❌ Persian Datepicker plugin NOT loaded!');
-            setTimeout(initializeDatepicker, 200);
-            return;
-        }
-        
-        console.log('✅ All libraries loaded!');
-        console.log('Initializing Persian Datepicker...');
         
         try {
-            $('#contract_date').persianDatepicker({
-                initialValue: false,
-                format: 'YYYY/MM/DD',
-                autoClose: true,
-                observer: true,
-                calendar: {
-                    persian: {
-                        locale: 'fa'
-                    }
-                },
-                toolbox: {
-                    enabled: true,
-                    todayButton: {
-                        enabled: true,
-                        text: {
-                            fa: 'امروز'
-                        }
-                    },
-                    submitButton: {
-                        enabled: true,
-                        text: {
-                            fa: 'تایید'
-                        }
-                    },
-                    calendarSwitch: {
-                        enabled: false
-                    }
-                },
-                onSelect: function(unix) {
-                    var selectedDate = this.getState().selected.formatted;
-                    $('#contract_date').val(selectedDate);
-                    console.log('✅ Date selected:', selectedDate);
-                }
-            });
+            // Convert to Jalali using persianDate
+            const d = new persianDate(new Date(miladiDate));
+            const jalali = d.format('YYYY/MM/DD');
             
-            console.log('🎉 Persian Datepicker initialized successfully!');
+            // Set the jalali date in hidden field
+            $('#contract_date').val(jalali);
             
-            // Make icon clickable
-            $('.date-icon').on('click', function(e) {
-                e.preventDefault();
-                console.log('Icon clicked!');
-                $('#contract_date').focus();
-            });
+            // Show result
+            $('#jalali_result').html('📅 تاریخ شمسی: ' + jalali).fadeIn();
             
-            // Log when field is clicked
-            $('#contract_date').on('focus', function() {
-                console.log('📅 Date field focused!');
-            });
-            
+            console.log('Date converted:', miladiDate, '→', jalali);
         } catch(error) {
-            console.error('❌ Error initializing datepicker:', error);
-            console.error('Error details:', error.message);
+            console.error('Error converting date:', error);
+            $('#jalali_result').html('خطا در تبدیل تاریخ').css('color', '#dc3232').fadeIn();
         }
-    }
-    
-    // Start initialization after a delay
-    setTimeout(initializeDatepicker, 1000);
+    });
     
     // Handle form submission
     $('#cooperation-contract-form').on('submit', function(e) {
