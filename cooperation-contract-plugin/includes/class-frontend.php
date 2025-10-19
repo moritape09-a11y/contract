@@ -118,13 +118,16 @@ class Cooperation_Contract_Frontend {
                         <div class="form-group">
                             <label for="contract_date">تاریخ قرارداد (شمسی): <span class="required">*</span></label>
                             <div class="date-picker-wrapper">
-                                <input type="text" id="contract_date" name="contract_date" 
-                                       placeholder="روی آیکون تقویم کلیک کنید" 
-                                       readonly
+                                <input type="text" 
+                                       id="contract_date" 
+                                       name="contract_date" 
+                                       class="contract-date-input"
+                                       placeholder="روی اینجا یا آیکون کلیک کنید" 
+                                       autocomplete="off"
                                        required>
-                                <span class="date-icon">📅</span>
+                                <span class="date-icon" title="باز کردن تقویم">📅</span>
                             </div>
-                            <small class="field-hint">روی آیکون تقویم کلیک کنید و تاریخ را انتخاب کنید</small>
+                            <small class="field-hint">⬆️ روی فیلد یا آیکون کلیک کنید تا تقویم باز شود</small>
                         </div>
                     </div>
                     

@@ -26,35 +26,31 @@ jQuery(document).ready(function($) {
         });
     }
     
-    // Initialize Persian Datepicker
-    $(document).ready(function() {
-        if (typeof $.fn.persianDatepicker !== 'undefined') {
-            $('#contract_date').persianDatepicker({
+    // Wait for everything to load, then initialize datepicker
+    setTimeout(function() {
+        console.log('Initializing Persian Datepicker...');
+        
+        if (typeof $.fn.persianDatepicker === 'undefined') {
+            console.error('Persian Datepicker library NOT loaded!');
+            alert('خطا: کتابخانه تقویم لود نشده است. لطفاً صفحه را Refresh کنید (Ctrl+F5)');
+            return;
+        }
+        
+        console.log('Persian Datepicker library found!');
+        
+        try {
+            var datepickerInstance = $('#contract_date').persianDatepicker({
                 initialValue: false,
                 format: 'YYYY/MM/DD',
                 autoClose: true,
+                observer: true,
                 calendar: {
                     persian: {
-                        locale: 'fa',
-                        showHint: true,
-                        leapYearMode: 'algorithmic'
-                    }
-                },
-                navigator: {
-                    enabled: true,
-                    scroll: {
-                        enabled: true
-                    },
-                    text: {
-                        btnNextText: '>',
-                        btnPrevText: '<'
+                        locale: 'fa'
                     }
                 },
                 toolbox: {
                     enabled: true,
-                    calendarSwitch: {
-                        enabled: false
-                    },
                     todayButton: {
                         enabled: true,
                         text: {
@@ -66,27 +62,37 @@ jQuery(document).ready(function($) {
                         text: {
                             fa: 'تایید'
                         }
+                    },
+                    calendarSwitch: {
+                        enabled: false
                     }
                 },
                 onSelect: function(unix) {
-                    // Get formatted date
-                    var date = new Date(unix);
-                    var persianDate = this.getState().selected.formatted;
-                    $('#contract_date').val(persianDate).trigger('change');
-                    console.log('Date selected:', persianDate);
+                    var selectedDate = this.getState().selected.formatted;
+                    $('#contract_date').val(selectedDate);
+                    console.log('Date selected:', selectedDate);
                 }
             });
             
-            // Make the icon clickable too
-            $('.date-icon').on('click', function() {
-                $('#contract_date').focus();
+            console.log('✅ Persian Datepicker initialized successfully!');
+            
+            // Make icon clickable
+            $('.date-icon').on('click', function(e) {
+                e.preventDefault();
+                $('#contract_date').click().focus();
             });
             
-            console.log('Persian Datepicker initialized successfully');
-        } else {
-            console.error('Persian Datepicker library not loaded');
+            // Test click
+            $('#contract_date').on('click', function() {
+                console.log('Date field clicked!');
+            });
+            
+        } catch(error) {
+            console.error('Error initializing datepicker:', error);
+            alert('خطا در راه‌اندازی تقویم: ' + error.message);
         }
-    });
+        
+    }, 500);
     
     // Handle form submission
     $('#cooperation-contract-form').on('submit', function(e) {

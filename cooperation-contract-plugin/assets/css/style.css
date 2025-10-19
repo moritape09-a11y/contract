@@ -231,20 +231,29 @@
 .date-picker-wrapper input {
     flex: 1;
     padding-left: 45px !important;
-    cursor: pointer;
-    background-color: #fff;
+    cursor: pointer !important;
+    background-color: #fff !important;
+}
+
+.contract-date-input {
+    cursor: pointer !important;
 }
 
 .date-icon {
     position: absolute;
     left: 12px;
-    font-size: 22px;
-    cursor: pointer;
+    font-size: 24px;
+    cursor: pointer !important;
     user-select: none;
     transition: transform 0.2s;
+    z-index: 10;
 }
 
 .date-icon:hover {
+    transform: scale(1.2);
+}
+
+.date-icon:active {
     transform: scale(1.1);
 }
 
@@ -256,6 +265,16 @@
 
 .datepicker-plot-area {
     direction: rtl !important;
+}
+
+/* Make sure datepicker is visible */
+.pwt-datepicker-input-element {
+    cursor: pointer !important;
+}
+
+/* Z-index for datepicker */
+body .datepicker-container {
+    z-index: 9999 !important;
 }
 
 /* Messages */
