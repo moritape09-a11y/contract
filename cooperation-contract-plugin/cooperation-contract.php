@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
 
 // Define plugin constants
 if (!defined('COOPERATION_CONTRACT_VERSION')) {
-    define('COOPERATION_CONTRACT_VERSION', '3.0.1');
+    define('COOPERATION_CONTRACT_VERSION', '4.0.0');
 }
 if (!defined('COOPERATION_CONTRACT_PLUGIN_DIR')) {
     define('COOPERATION_CONTRACT_PLUGIN_DIR', plugin_dir_path(__FILE__));

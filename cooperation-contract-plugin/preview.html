@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پیش‌نمایش طراحی قرارداد همکاری</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Vazirmatn', Tahoma, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div class="cooperation-contract-wrapper">
+        <div class="contract-text-section">
+            <h2>قرارداد همکاری</h2>
+            <p>این قرارداد در تاریخ ______ بین طرفین منعقد می‌گردد. طرف اول متعهد می‌شود که خدمات مورد نظر را با کیفیت عالی ارائه نماید و طرف دوم نیز متعهد به پرداخت به موقع می‌باشد.</p>
+            <p>این یک نمونه متن قرارداد است که در بخش تنظیمات افزونه قابل ویرایش می‌باشد. شما می‌توانید متن کامل قرارداد خود را در آنجا وارد نمایید.</p>
+        </div>
+        
+        <div class="contract-form-section">
+            <h3>اطلاعات قرارداد</h3>
+            
+            <form id="cooperation-contract-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="first_name">نام: <span class="required">*</span></label>
+                        <input type="text" id="first_name" name="first_name" placeholder="نام خود را وارد کنید" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="last_name">نام خانوادگی: <span class="required">*</span></label>
+                        <input type="text" id="last_name" name="last_name" placeholder="نام خانوادگی خود را وارد کنید" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="national_id">کد ملی: <span class="required">*</span></label>
+                        <input type="text" id="national_id" name="national_id" pattern="[0-9]{10}" maxlength="10" placeholder="1234567890" required>
+                        <small class="field-hint">کد ملی 10 رقمی خود را وارد کنید</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="institution_name">نام آموزشگاه: <span class="required">*</span></label>
+                        <input type="text" id="institution_name" name="institution_name" placeholder="نام آموزشگاه" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="position">سمت/عنوان: <span class="required">*</span></label>
+                        <input type="text" id="position" name="position" placeholder="سمت یا عنوان شغلی" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="miladi_date">تاریخ قرارداد: <span class="required">*</span></label>
+                        <input type="date" id="miladi_date" name="miladi_date" required>
+                        <input type="hidden" id="contract_date" name="contract_date">
+                        <div id="jalali_result" style="display: block;">📅 تاریخ شمسی: 1403/07/28</div>
+                        <small class="field-hint">تاریخ میلادی را انتخاب کنید</small>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="address">آدرس: <span class="required">*</span></label>
+                    <textarea id="address" name="address" rows="3" placeholder="آدرس کامل خود را وارد کنید" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>طرح انتخابی: <span class="required">*</span></label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="selected_plan" value="طرح سایت" required>
+                            <span>طرح سایت</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="selected_plan" value="طرح گروه" checked required>
+                            <span>طرح گروه</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="selected_plan" value="طرح طلایی" required>
+                            <span>طرح طلایی</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>امضا: <span class="required">*</span></label>
+                    <div class="signature-container">
+                        <canvas id="signature-pad" class="signature-pad"></canvas>
+                    </div>
+                    <button type="button" id="clear-signature" class="button-secondary">پاک کردن امضا</button>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="button-primary">ثبت قرارداد</button>
+                </div>
+                
+                <div id="form-message">
+                    <!-- پیغام‌های موفقیت/خطا اینجا نمایش داده می‌شود -->
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+    <script>
+        // Simple demo - signature pad only
+        var canvas = document.getElementById('signature-pad');
+        if (canvas) {
+            var signaturePad = new SignaturePad(canvas, {
+                backgroundColor: 'rgb(255, 255, 255)',
+                penColor: 'rgb(0, 0, 0)'
+            });
+            
+            function resizeCanvas() {
+                var ratio = Math.max(window.devicePixelRatio || 1, 1);
+                canvas.width = canvas.offsetWidth * ratio;
+                canvas.height = canvas.offsetHeight * ratio;
+                canvas.getContext("2d").scale(ratio, ratio);
+                signaturePad.clear();
+            }
+            
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+            
+            document.getElementById('clear-signature').addEventListener('click', function() {
+                signaturePad.clear();
+            });
+        }
+        
+        // Demo form submit
+        document.getElementById('cooperation-contract-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            var msg = document.getElementById('form-message');
+            msg.innerHTML = '<div class="success-message"><strong>قرارداد همکاری به‌صورت رسمی و قانونی تنظیم و امضا گردید.</strong><br>قرارداد با شماره 123 ذخیره شد.</div>';
+            msg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+    </script>
+</body>
+</html>
